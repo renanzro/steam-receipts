@@ -40,7 +40,7 @@ export function provideSteamContext() {
   const allTimeGames = ref<RecentGame[]>([]);
   const receiptOptions = ref<ReceiptOptions>({
     type: 'recent',
-    limit: 20
+    limit: 10
   });
   const isLoading = ref(false);
   const error = ref<string | null>(null);

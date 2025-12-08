@@ -62,8 +62,8 @@
   import { computed, ref, onMounted, onUnmounted } from 'vue';
   import { useSteamContext } from '../composables';
   import type { RecentGame } from '../types';
-  import barcodeImage from '../assets/barcode.png';
-  import wrinkledPaper from '../assets/paper-texture-background.jpg';
+  const barcodeImage: string = new URL('../assets/barcode.png', import.meta.url).href;
+  const wrinkledPaper: string = new URL('../assets/paper-texture-background.jpg', import.meta.url).href;
 
   const { user, receiptOptions, displayedGames, totalPlaytime, setReceiptElement } =
     useSteamContext();
