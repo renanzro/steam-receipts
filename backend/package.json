@@ -19,5 +19,9 @@
     "@types/node": "^22.0.0",
     "drizzle-kit": "^0.31.7",
     "typescript": "^5.6.0"
+  },
+  "trustedDependencies": [],
+  "overrides": {
+    "better-sqlite3": "npm:empty-npm-package@1.0.0"
   }
 }
