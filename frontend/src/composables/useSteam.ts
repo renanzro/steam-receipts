@@ -62,16 +62,14 @@ export function provideSteamContext() {
     return games.slice(0, receiptOptions.value.limit);
   });
 
-  const API_URL = import.meta.env.VITE_API_URL || '';
-
   const login = () => {
     // Redirect to backend which handles Steam OpenID
-    window.location.href = `${API_URL}/auth/steam`;
+    window.location.href = '/api/auth/steam';
   };
 
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/auth/logout`, {
+      await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include'
       });
@@ -87,7 +85,7 @@ export function provideSteamContext() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(`${API_URL}/auth/me`, {
+      const response = await fetch('/api/auth/me', {
         credentials: 'include'
       });
 
@@ -114,7 +112,7 @@ export function provideSteamContext() {
     error.value = null;
 
     try {
-      const response = await fetch(`${API_URL}/steam/games/recent?limit=${MAX_ITEMS}`, {
+      const response = await fetch(`/api/steam/games/recent?limit=${MAX_ITEMS}`, {
         credentials: 'include'
       });
 
@@ -142,7 +140,7 @@ export function provideSteamContext() {
     error.value = null;
 
     try {
-      const response = await fetch(`${API_URL}/steam/games?limit=${MAX_ITEMS}`, {
+      const response = await fetch(`/api/steam/games?limit=${MAX_ITEMS}`, {
         credentials: 'include'
       });
 
