@@ -71,7 +71,7 @@ export function provideSteamContext() {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
+      await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -87,7 +87,7 @@ export function provideSteamContext() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch(`${API_URL}/auth/me`, {
         credentials: 'include'
       });
 
@@ -114,7 +114,7 @@ export function provideSteamContext() {
     error.value = null;
 
     try {
-      const response = await fetch(`/api/steam/games/recent?limit=${MAX_ITEMS}`, {
+      const response = await fetch(`${API_URL}/steam/games/recent?limit=${MAX_ITEMS}`, {
         credentials: 'include'
       });
 
@@ -142,7 +142,7 @@ export function provideSteamContext() {
     error.value = null;
 
     try {
-      const response = await fetch(`/api/steam/games?limit=${MAX_ITEMS}`, {
+      const response = await fetch(`${API_URL}/steam/games?limit=${MAX_ITEMS}`, {
         credentials: 'include'
       });
 
