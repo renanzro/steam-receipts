@@ -1,5 +1,6 @@
 {
   "buildCommand": "bun run build",
   "installCommand": "bun install",
-  "framework": "vite"
+  "framework": "vite",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- ."
 }
