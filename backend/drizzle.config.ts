@@ -5,6 +5,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'sqlite',
   dbCredentials: {
-    url: './steam-receipts.db',
+    url: process.env.DATABASE_PATH ?? 'steam-receipts.db',
   },
 });

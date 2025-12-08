@@ -33,8 +33,6 @@ export async function verifySteamResponse(query: Record<string, string>): Promis
   // Change mode to check_authentication
   params.set('openid.mode', 'check_authentication')
 
-  console.log('Verification params:', params.toString().substring(0, 200) + '...')
-
   try {
     const response = await fetch(STEAM_OPENID_URL, {
       method: 'POST',
@@ -46,7 +44,6 @@ export async function verifySteamResponse(query: Record<string, string>): Promis
     })
 
     const text = await response.text()
-    console.log('Steam verification response:', text)
 
     // Steam returns "ns:http://specs.openid.net/auth/2.0\nis_valid:true\n" on success
     return text.includes('is_valid:true')
