@@ -50,11 +50,13 @@ auth.get('/steam/callback', async (c) => {
     // Cache user profile in database
     await cacheUser(player)
 
+    const isSecure = process.env.USE_HTTPS === 'true';
+
     // Set session cookie (simple approach - you could use JWT instead)
     setCookie(c, 'steam_id', steamId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax',
+      secure: isSecure,
+      sameSite: isSecure ? 'None' : 'Lax', // 'None' required for cross-site cookies
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     })
