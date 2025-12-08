@@ -62,9 +62,11 @@ export function provideSteamContext() {
     return games.slice(0, receiptOptions.value.limit);
   });
 
+  const API_URL = import.meta.env.VITE_API_URL || '';
+
   const login = () => {
     // Redirect to backend which handles Steam OpenID
-    window.location.href = '/api/auth/steam';
+    window.location.href = `${API_URL}/auth/steam`;
   };
 
   const logout = async () => {
