@@ -10,7 +10,9 @@ const auth = new Hono()
 
 // Redirect user to Steam login
 auth.get('/steam', (c) => {
-  const returnUrl = `${!useHttps ? 'http' : 'https'}://${c.req.header('host')}/auth/steam/callback`
+  // Use FRONTEND_URL for the callback so it goes through Vercel proxy
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080'
+  const returnUrl = `${frontendUrl}/api/auth/steam/callback`
   const steamLoginUrl = buildSteamLoginUrl(returnUrl)
   return c.redirect(steamLoginUrl)
 })
@@ -19,13 +21,11 @@ auth.get('/steam', (c) => {
 auth.get('/steam/callback', async (c) => {
   const query = c.req.query()
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080'
-
-  console.log('Steam callback received, query params:', Object.keys(query))
+  const isSecure = process.env.USE_HTTPS === 'true'
 
   try {
     // Verify the Steam response
     const isValid = await verifySteamResponse(query)
-    console.log('Steam verification result:', isValid)
     
     if (!isValid) {
       return c.redirect(`${frontendUrl}?error=invalid_response`)
@@ -33,7 +33,6 @@ auth.get('/steam/callback', async (c) => {
 
     // Extract Steam ID from the claimed_id
     const steamId = extractSteamId(query['openid.claimed_id'])
-    console.log('Extracted Steam ID:', steamId)
     
     if (!steamId) {
       return c.redirect(`${frontendUrl}?error=no_steam_id`)
@@ -41,7 +40,6 @@ auth.get('/steam/callback', async (c) => {
 
     // Fetch user profile
     const player = await getPlayerSummary(steamId)
-    console.log('Player data:', player?.personaname || 'not found')
     
     if (!player) {
       return c.redirect(`${frontendUrl}?error=player_not_found`)
@@ -50,13 +48,11 @@ auth.get('/steam/callback', async (c) => {
     // Cache user profile in database
     await cacheUser(player)
 
-    const isSecure = process.env.USE_HTTPS === 'true';
-
-    // Set session cookie (simple approach - you could use JWT instead)
+    // Set session cookie - Lax works now since callback goes through Vercel
     setCookie(c, 'steam_id', steamId, {
       httpOnly: true,
       secure: isSecure,
-      sameSite: isSecure ? 'None' : 'Lax', // 'None' required for cross-site cookies
+      sameSite: 'Lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     })
@@ -97,7 +93,7 @@ auth.post('/logout', (c) => {
   setCookie(c, 'steam_id', '', {
     httpOnly: true,
     secure: isSecure,
-    sameSite: isSecure ? 'None' : 'Lax',
+    sameSite: 'Lax',
     maxAge: 0,
     path: '/',
   })
