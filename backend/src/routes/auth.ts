@@ -92,10 +92,12 @@ auth.get('/me', async (c) => {
 
 // Logout
 auth.post('/logout', (c) => {
+  const isSecure = process.env.USE_HTTPS === 'true'
+  
   setCookie(c, 'steam_id', '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Lax',
+    secure: isSecure,
+    sameSite: isSecure ? 'None' : 'Lax',
     maxAge: 0,
     path: '/',
   })
