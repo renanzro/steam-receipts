@@ -2,6 +2,27 @@
   <div class="app-logo" :style="logoStyle" v-html="logoSvg" />
 </template>
 
+<script setup lang="ts">
+  import { computed } from 'vue';
+  import logoSvg from '~/assets/logo.svg?raw';
+
+  const props = withDefaults(
+    defineProps<{
+      size?: number;
+      color?: string;
+    }>(),
+    {
+      size: 24,
+      color: 'white'
+    }
+  );
+
+  const logoStyle = computed(() => ({
+    width: `${props.size}px`,
+    height: `${props.size}px`
+  }));
+</script>
+
 <style scoped>
   .app-logo {
     display: inline-flex;
@@ -20,24 +41,3 @@
     fill: v-bind(color) !important;
   }
 </style>
-
-<script setup lang="ts">
-  import { computed } from 'vue';
-  import logoSvg from '../assets/logo.svg?raw';
-
-  const props = withDefaults(
-    defineProps<{
-      size?: number;
-      color?: string;
-    }>(),
-    {
-      size: 24,
-      color: 'white'
-    }
-  );
-
-  const logoStyle = computed(() => ({
-    width: `${props.size}px`,
-    height: `${props.size}px`
-  }));
-</script>

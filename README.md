@@ -2,7 +2,8 @@
 
 A Receiptify-style web app for Steam accounts that displays your gaming activity in a stylish receipt format.
 
-![Steam Receipts](https://img.shields.io/badge/Vue.js%203-4FC08D?style=flat&logo=vue.js&logoColor=white)
+![Nuxt](https://img.shields.io/badge/Nuxt%203-00DC82?style=flat&logo=nuxt&logoColor=white)
+![Vue.js](https://img.shields.io/badge/Vue.js%203-4FC08D?style=flat&logo=vue.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat&logo=typescript&logoColor=white)
 ![Vuetify](https://img.shields.io/badge/Vuetify%203-1867C0?style=flat&logo=vuetify&logoColor=white)
 ![Hono](https://img.shields.io/badge/Hono-E36002?style=flat&logo=hono&logoColor=white)
@@ -17,23 +18,29 @@ A Receiptify-style web app for Steam accounts that displays your gaming activity
 - 📥 **Download as Image** - Export your receipt as a PNG image
 - 🎨 **Steam-themed Dark UI** - Featuring a responsive design using Steam's signature colors
 - 💾 **Database Caching** - SQLite caching for improved performance
-- 🎯 **Demo Mode** - Try the app with mock data without logging in
 
 ## Tech Stack
 
-### Frontend
+### Frontend (Nuxt BFF Pattern)
+- **Nuxt 3** - Full-stack Vue framework with server-side rendering
 - **Vue.js 3** with Composition API
 - **TypeScript** for type safety
 - **Vuetify 3** for Material Design components
-- **Vite** for fast development and building
 - **html2canvas** for receipt image export
+- **Nitro** - Server engine for serverless deployment (Vercel)
 
-### Backend
+### Backend API
 - **Bun** - Fast JavaScript runtime and package manager
 - **Hono** - Fast, lightweight web framework
 - **Drizzle ORM** - TypeScript ORM for SQLite
 - **Bun SQLite** - Native SQLite database driver
 - **Steam OpenID** - Authentication via Steam
+
+### Architecture
+- **BFF (Backend for Frontend)** - Nuxt server acts as a proxy between browser and API
+- **Separate Domains** - Frontend on Vercel, Backend on Railway
+- **HttpOnly Cookies** - Secure session management on Nuxt domain
+- **Server-to-Server Communication** - Nuxt server calls backend API internally
 
 ## Getting Started
 
@@ -55,7 +62,7 @@ A Receiptify-style web app for Steam accounts that displays your gaming activity
 
    ```bash
    cd backend && bun install
-   cd ../frontend && bun install
+   cd ../frontend && npm install
    ```
 
 3. Configure environment variables:
@@ -67,6 +74,7 @@ A Receiptify-style web app for Steam accounts that displays your gaming activity
 
    # Frontend (.env)
    cp frontend/.env.example frontend/.env
+   # Edit frontend/.env and set NUXT_BACKEND_URL to your backend URL
    ```
 
 4. Initialize the database:
@@ -80,11 +88,11 @@ A Receiptify-style web app for Steam accounts that displays your gaming activity
 5. Start both servers:
 
    ```bash
-   # Terminal 1 - Backend
+   # Terminal 1 - Backend (runs on port 3000)
    cd backend && bun run dev
 
-   # Terminal 2 - Frontend
-   cd frontend && bun run dev
+   # Terminal 2 - Frontend (runs on port 8080)
+   cd frontend && npm run dev
    ```
 
 6. Open http://localhost:8080 in your browser
@@ -92,37 +100,53 @@ A Receiptify-style web app for Steam accounts that displays your gaming activity
 ### Building for Production
 
 ```bash
-# Build frontend
-cd frontend && bun run build
+# Build frontend (generates Vercel-ready output in .vercel/output)
+cd frontend && npm run build
 
 # Build backend
 cd backend && bun run build
 ```
 
+### Deployment
+
+- **Frontend**: Deploy to Vercel (auto-detects Nuxt, uses Nitro preset)
+- **Backend**: Deploy to Railway or any Node.js/Bun-compatible host
+- Set environment variables:
+  - Frontend: `NUXT_BACKEND_URL` (your Railway backend URL)
+  - Backend: `STEAM_API_KEY`, `DATABASE_URL` (if using remote DB)
+
 ## Project Structure
 
 ```
 steam-receipts/
-├── frontend/
-│   ├── src/
-│   │   ├── components/             # Vue components
-│   │   │   ├── SteamReceipt.vue    # Main receipt display
-│   │   │   ├── ReceiptOptions.vue  # Settings panel
-│   │   │   ├── LoginCard.vue       # Login UI
-│   │   │   ├── LoadingState.vue    # Loading spinner
-│   │   │   └── AppLogo.vue         # App logo component
-│   │   ├── composables/            # Composition API hooks
-│   │   │   └── useSteam.ts         # Steam context (auth, games)
-│   │   ├── types/                  # TypeScript types
-│   │   │   └── steam.ts            # Steam API types
-│   │   ├── assets/                 # Static assets (fonts, images)
-│   │   ├── App.vue                 # Root component
-│   │   └── main.ts                 # App entry point
+├── frontend/                    # Nuxt 3 Application
+│   ├── components/              # Vue components
+│   │   ├── SteamReceipt.vue     # Main receipt display
+│   │   ├── ReceiptOptions.vue   # Settings panel
+│   │   ├── LoginCard.vue        # Login UI
+│   │   ├── LoadingState.vue     # Loading spinner
+│   │   └── AppLogo.vue          # App logo component
+│   ├── composables/             # Auto-imported composables
+│   │   └── useSteam.ts          # Steam state management
+│   ├── server/api/              # Nuxt server routes (BFF layer)
+│   │   ├── auth/                # Authentication endpoints
+│   │   │   ├── login.get.ts     # Initiate Steam login
+│   │   │   ├── callback.get.ts  # Handle Steam callback
+│   │   │   ├── me.get.ts        # Get current user
+│   │   │   └── logout.post.ts   # Logout
+│   │   └── steam/               # Steam data proxy
+│   │       ├── profile.get.ts   # User profile
+│   │       └── games/           # Games endpoints
+│   ├── types/                   # TypeScript types
+│   │   └── steam.ts             # Steam API types
+│   ├── assets/                  # Static assets (fonts, images)
+│   ├── app.vue                  # Root component
+│   ├── nuxt.config.ts           # Nuxt configuration
 │   └── package.json
-├── backend/
+├── backend/                     # Hono API Server
 │   ├── src/
 │   │   ├── routes/              # API routes
-│   │   │   ├── auth.ts          # Steam authentication
+│   │   │   ├── auth.ts          # Steam authentication & validation
 │   │   │   └── steam.ts         # Steam data endpoints
 │   │   ├── lib/                 # Utilities
 │   │   │   ├── steam-auth.ts    # OpenID helpers
@@ -140,16 +164,21 @@ steam-receipts/
 
 ## API Endpoints
 
-### Authentication
-- `GET /auth/steam` - Redirect to Steam login
-- `GET /auth/steam/callback` - Handle Steam OAuth callback
-- `GET /auth/me` - Get current user session
-- `POST /auth/logout` - Logout user
+### Nuxt Server Routes (BFF - Browser calls these)
+- `GET /api/auth/login` - Initiate Steam login flow
+- `GET /api/auth/callback` - Handle Steam OAuth callback
+- `GET /api/auth/me` - Get current user session
+- `POST /api/auth/logout` - Clear session cookie
+- `GET /api/steam/games` - Get user's owned games (all-time)
+- `GET /api/steam/games/recent` - Get recently played games
+- `GET /api/steam/profile` - Get user's Steam profile
 
-### Steam Data
-- `GET /steam/games` - Get user's owned games (sorted by all-time playtime)
-- `GET /steam/games/recent` - Get recently played games (last 2 weeks)
-- `GET /steam/profile` - Get user's Steam profile
+### Backend API Routes (Nuxt server calls these)
+- `GET /auth/steam/url` - Get Steam OpenID login URL
+- `POST /auth/steam/validate` - Validate Steam OpenID response
+- `GET /steam/games` - Get owned games (requires `X-Steam-Id` header)
+- `GET /steam/games/recent` - Get recent games (requires `X-Steam-Id` header)
+- `GET /steam/profile` - Get profile (requires `X-Steam-Id` header)
 
 ## License
 

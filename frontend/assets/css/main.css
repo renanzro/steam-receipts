@@ -20,3 +20,8 @@
 .border-accent {
   border: 1px solid rgb(var(--v-theme-accent-border)) !important;
 }
+
+/* Main content background */
+.main-content {
+  background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
+}

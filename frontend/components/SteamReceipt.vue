@@ -51,7 +51,7 @@
         <p class="footer-text">Thank you for gaming!</p>
         <p v-if="origin" class="footer-subtext">{{ origin }}</p>
         <!-- use actual barcode font in future -->
-        <v-img :src="barcodeImage" alt="Barcode" contain />
+        <img :src="barcodeImage" alt="Barcode" style="max-width: 100%" />
         <p class="steam-id">{{ user?.steamid }}</p>
       </div>
     </div>
@@ -60,13 +60,11 @@
 
 <script setup lang="ts">
   import { computed, ref, onMounted, onUnmounted } from 'vue';
-  import { useSteamContext } from '../composables';
-  import type { RecentGame } from '../types';
-  const barcodeImage: string = new URL('../assets/barcode.png', import.meta.url).href;
-  const wrinkledPaper: string = new URL('../assets/paper-texture-background.jpg', import.meta.url).href;
+  import type { RecentGame } from '~/types/steam';
+  import barcodeImage from '~/assets/barcode.png';
+  import wrinkledPaper from '~/assets/paper-texture-background.jpg';
 
-  const { user, receiptOptions, displayedGames, totalPlaytime, setReceiptElement } =
-    useSteamContext();
+  const { user, receiptOptions, displayedGames, totalPlaytime, setReceiptElement } = useSteam();
 
   const origin = computed(() =>
     typeof window !== 'undefined' && window.location?.origin
@@ -75,16 +73,6 @@
   );
 
   const receiptCard = ref<{ $el: HTMLElement } | null>(null);
-
-  onMounted(() => {
-    if (receiptCard.value?.$el) {
-      setReceiptElement(receiptCard.value.$el);
-    }
-  });
-
-  onUnmounted(() => {
-    setReceiptElement(null);
-  });
 
   const randomPosition = Math.floor(Math.random() * 100);
 
@@ -133,12 +121,22 @@
     }
     return `${hours}h ${mins}m`;
   }
+
+  onMounted(() => {
+    if (receiptCard.value?.$el) {
+      setReceiptElement(receiptCard.value.$el);
+    }
+  });
+
+  onUnmounted(() => {
+    setReceiptElement(null);
+  });
 </script>
 
 <style scoped>
   @font-face {
     font-family: 'Fake Receipt';
-    src: url('../assets/Fake Receipt.otf') format('opentype');
+    src: url('~/assets/Fake Receipt.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
   }

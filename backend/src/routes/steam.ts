@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-import { getCookie } from 'hono/cookie'
 import { getOwnedGames, getPlayerSummary, getRecentlyPlayedGames } from '../lib/steam-api.js'
 import { getCachedUser, getCachedUserGames, cacheUser, cacheUserGames } from '../db/queries.js'
 
@@ -9,9 +8,10 @@ type Variables = {
 
 const steam = new Hono<{ Variables: Variables }>()
 
-// Middleware to check authentication
+// Middleware to check authentication via X-Steam-Id header (from Nuxt BFF)
 steam.use('*', async (c, next) => {
-  const steamId = getCookie(c, 'steam_id')
+  const steamId = c.req.header('X-Steam-Id')
+  
   if (!steamId) {
     return c.json({ error: 'Unauthorized' }, 401)
   }

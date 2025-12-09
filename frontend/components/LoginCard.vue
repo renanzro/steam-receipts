@@ -42,18 +42,16 @@
     </v-card-text>
 
     <v-card-text class="py-2 text-caption text-medium-emphasis">
-      <v-img :src="SingInThroughSteam" alt="Sign in through Steam" height="35" />
+      <img :src="signInThroughSteam" alt="Sign in through Steam" style="height: 35px" />
       <p>Your credentials are never shared with us.</p>
     </v-card-text>
   </v-card>
 </template>
 
 <script setup lang="ts">
-  import { useSteamContext } from '../composables';
-  import AppLogo from './AppLogo.vue';
-  import SingInThroughSteam from '../assets/sits_01.png';
+  import signInThroughSteam from '~/assets/sits_01.png';
 
-  const { login, setMockData, isLoading, error } = useSteamContext();
+  const { login, setMockData, isLoading, error } = useSteam();
 
   function handleLogin() {
     login();

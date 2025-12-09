@@ -81,11 +81,9 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue';
   import html2canvas from 'html2canvas';
-  import { useSteamContext } from '../composables';
-  import type { ReceiptType } from '../types';
+  import type { ReceiptType } from '~/types/steam';
 
-  const { user, receiptOptions, receiptElement, setReceiptType, setReceiptLimit } =
-    useSteamContext();
+  const { user, receiptOptions, receiptElement, setReceiptType, setReceiptLimit } = useSteam();
 
   const selectedType = ref<ReceiptType>(receiptOptions.value.type);
   const selectedLimit = ref(10);

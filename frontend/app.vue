@@ -48,16 +48,28 @@
   </v-app>
 </template>
 
-<style scoped>
-  .main-content {
-    background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
-  }
-</style>
-
 <script setup lang="ts">
-  import { provideSteamContext } from './composables';
-  import { SteamReceipt, LoginCard, LoadingState, ReceiptOptions, AppLogo } from './components';
+  const { isAuthenticated, logout, isLoading, checkAuth, error } = useSteam();
 
-  // Provide the Steam context at the app root
-  const { isAuthenticated, logout, isLoading } = provideSteamContext();
+  // Initialize auth on client-side mount
+  onMounted(async () => {
+    isLoading.value = true;
+    if (import.meta.client) {
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.get('login') === 'success') {
+        // Clear URL params
+        window.history.replaceState({}, '', window.location.pathname);
+        // Check authentication status
+        await checkAuth();
+      } else if (params.get('error')) {
+        error.value = `Login failed: ${params.get('error')}`;
+        window.history.replaceState({}, '', window.location.pathname);
+      } else {
+        // Check if already authenticated
+        await checkAuth();
+      }
+    }
+    isLoading.value = false;
+  });
 </script>
