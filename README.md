@@ -1,13 +1,21 @@
-# Steam Receipts
+<h1 align="center">Steam Receipts</h1>
 
-A Receiptify-style web app for Steam accounts that displays your gaming activity in a stylish receipt format.
+<p align="center">
+  <img src="frontend/public/logo.svg" width="100" height="100" alt="Steam Receipts" />
+</p>
 
-![Nuxt](https://img.shields.io/badge/Nuxt%203-00DC82?style=flat&logo=nuxt&logoColor=white)
-![Vue.js](https://img.shields.io/badge/Vue.js%203-4FC08D?style=flat&logo=vue.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=flat&logo=typescript&logoColor=white)
-![Vuetify](https://img.shields.io/badge/Vuetify%203-1867C0?style=flat&logo=vuetify&logoColor=white)
-![Hono](https://img.shields.io/badge/Hono-E36002?style=flat&logo=hono&logoColor=white)
-![Bun](https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white)
+<p align="center">
+  <strong>A Receiptify-style web app for Steam accounts that displays your gaming activity in a stylish receipt format.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Nuxt%203-00DC82?style=flat&logo=nuxt&logoColor=white" alt="Nuxt 3" />
+  <img src="https://img.shields.io/badge/Vue.js%203-4FC08D?style=flat&logo=vue.js&logoColor=white" alt="Vue.js 3" />
+  <img src="https://img.shields.io/badge/TypeScript-blue?style=flat&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vuetify%203-1867C0?style=flat&logo=vuetify&logoColor=white" alt="Vuetify 3" />
+  <img src="https://img.shields.io/badge/Hono-E36002?style=flat&logo=hono&logoColor=white" alt="Hono" />
+  <img src="https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white" alt="Bun" />
+</p>
 
 ## Features
 
@@ -18,6 +26,18 @@ A Receiptify-style web app for Steam accounts that displays your gaming activity
 - 📥 **Download as Image** - Export your receipt as a PNG image
 - 🎨 **Steam-themed Dark UI** - Featuring a responsive design using Steam's signature colors
 - 💾 **Database Caching** - SQLite caching for improved performance
+
+<details>
+<summary>Screenshots</summary>
+<br>
+
+| Home Screen | All Time Receipt Example |
+|:---:|:---:|
+| <img src="examples/home.png" width="400" /> | <img src="examples/all_time_receipt.png" width="400" /> |
+
+</details>
+
+---
 
 ## Tech Stack
 
