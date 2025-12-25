@@ -33,8 +33,16 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Server-side only (not exposed to client)
-    backendUrl: process.env.NUXT_BACKEND_URL || 'http://localhost:3000',
+    steamApiKey: process.env.STEAM_API_KEY || '',
     sessionSecret: process.env.NUXT_SESSION_SECRET || 'your-secret-key-change-in-production',
+
+    // Firebase Admin SDK credentials (server-side only)
+    firebase: {
+      projectId: process.env.FIREBASE_PROJECT_ID || '',
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+      privateKey: process.env.FIREBASE_PRIVATE_KEY || ''
+    },
+
     // Public (exposed to client)
     public: {
       appName: 'Steam Receipts'

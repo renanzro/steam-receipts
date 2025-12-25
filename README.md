@@ -1,7 +1,7 @@
 <h1 align="center">Steam Receipts</h1>
 
 <p align="center">
-  <img src="frontend/public/logo.svg" width="100" height="100" alt="Steam Receipts" />
+  <img src="public/logo.svg" width="100" height="100" alt="Steam Receipts" />
 </p>
 
 <p align="center">
@@ -13,8 +13,8 @@
   <img src="https://img.shields.io/badge/Vue.js%203-4FC08D?style=flat&logo=vue.js&logoColor=white" alt="Vue.js 3" />
   <img src="https://img.shields.io/badge/TypeScript-blue?style=flat&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vuetify%203-1867C0?style=flat&logo=vuetify&logoColor=white" alt="Vuetify 3" />
-  <img src="https://img.shields.io/badge/Hono-E36002?style=flat&logo=hono&logoColor=white" alt="Hono" />
-  <img src="https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white" alt="Bun" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black" alt="Firebase" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white" alt="Vercel" />
 </p>
 
 ## Features
@@ -25,14 +25,15 @@
 - 🎚️ **Customizable** - Adjust the number of games shown (1-25 items)
 - 📥 **Download as Image** - Export your receipt as a PNG image
 - 🎨 **Steam-themed Dark UI** - Featuring a responsive design using Steam's signature colors
-- 💾 **Database Caching** - SQLite caching for improved performance
+- 💾 **Firebase Caching** - Firestore caching for improved performance and scalability
+- ☁️ **Serverless Architecture** - Deployed entirely on Vercel with zero backend maintenance
 
 <details>
 <summary>Screenshots</summary>
 <br>
 
-| Home Screen | All Time Receipt Example |
-|:---:|:---:|
+|                 Home Screen                 |                All Time Receipt Example                 |
+| :-----------------------------------------: | :-----------------------------------------------------: |
 | <img src="examples/home.png" width="400" /> | <img src="examples/all_time_receipt.png" width="400" /> |
 
 </details>
@@ -41,159 +42,128 @@
 
 ## Tech Stack
 
-### Frontend (Nuxt BFF Pattern)
 - **Nuxt 3** - Full-stack Vue framework with server-side rendering
 - **Vue.js 3** with Composition API
 - **TypeScript** for type safety
 - **Vuetify 3** for Material Design components
 - **html2canvas** for receipt image export
-- **Nitro** - Server engine for serverless deployment (Vercel)
 
-### Backend API
-- **Bun** - Fast JavaScript runtime and package manager
-- **Hono** - Fast, lightweight web framework
-- **Drizzle ORM** - TypeScript ORM for SQLite
-- **Bun SQLite** - Native SQLite database driver
+### Backend (Serverless)
+
+- **Nitro** - Server engine powering Nuxt server routes
+- **Firebase Admin SDK** - Server-side Firestore access for caching
+- **Firestore** - NoSQL document database for caching user data
+- **Steam Web API** - Direct API calls for game data
 - **Steam OpenID** - Authentication via Steam
 
 ### Architecture
-- **BFF (Backend for Frontend)** - Nuxt server acts as a proxy between browser and API
-- **Separate Domains** - Frontend on Vercel, Backend on Railway
-- **HttpOnly Cookies** - Secure session management on Nuxt domain
+
+- **Serverless Nuxt** - All backend logic runs in Nuxt server routes (serverless functions)
+- **Single Deployment** - Entire app deployed to Vercel (no separate backend)
+- **Direct Steam API Calls** - Server routes fetch data directly from Steam
+- **Firestore Caching** - 1-hour cache TTL reduces Steam API calls
+- **HttpOnly Cookies** - Secure session management
 - **Server-to-Server Communication** - Nuxt server calls backend API internally
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) v1.0+
+- [Node.js](https://nodejs.org/) v18+ or [Bun](https://bun.sh)
 - A [Steam Web API Key](https://steamcommunity.com/dev/apikey)
+- A [Firebase](https://firebase.google.com/) project with Firestore enabled
 
 ### Installation
 
-1. Clone the repository:
+1. Clone the repository and install dependencies:
 
    ```bash
    git clone https://github.com/renanzro/steam-receipts.git
    cd steam-receipts
+
+   npm install
    ```
 
-2. Install dependencies for both frontend and backend:
-
-   ```bash
-   cd backend && bun install
-   cd ../frontend && npm install
-   ```
+2. Set up Firebase:
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project
+   - Enable **Firestore Database** (production mode)
+   - Go to **Project Settings → Service Accounts**
+   - Click **Generate New Private Key** and download the JSON file
 
 3. Configure environment variables:
 
    ```bash
-   # Backend (.env)
-   cp backend/.env.example backend/.env
-   # Edit backend/.env and add your STEAM_API_KEY
-
-   # Frontend (.env)
-   cp frontend/.env.example frontend/.env
-   # Edit frontend/.env and set NUXT_BACKEND_URL to your backend URL
+   cp .env.example .env
    ```
 
-4. Initialize the database:
+   Edit `.env` and add:
 
-   ```bash
-   cd backend
-   bun run db:generate
-   bun run db:migrate
+   ```env
+   STEAM_API_KEY=your-steam-api-key
+   NUXT_SESSION_SECRET=generate-random-string-here
+
+   FIREBASE_PROJECT_ID=your-project-id
+   FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
    ```
 
-5. Start both servers:
+4. Start the development server:
 
    ```bash
-   # Terminal 1 - Backend (runs on port 3000)
-   cd backend && bun run dev
-
-   # Terminal 2 - Frontend (runs on port 8080)
+   Frontend (runs on port 8080)
    cd frontend && npm run dev
    ```
 
-6. Open http://localhost:8080 in your browser
+5. Open http://localhost:8080 in your browser
 
 ### Building for Production
 
 ```bash
-# Build frontend (generates Vercel-ready output in .vercel/output)
-cd frontend && npm run build
-
-# Build backend
-cd backend && bun run build
+npm run build
 ```
 
 ### Deployment
 
-- **Frontend**: Deploy to Vercel (auto-detects Nuxt, uses Nitro preset)
-- **Backend**: Deploy to Railway or any Node.js/Bun-compatible host
-- Set environment variables:
-  - Frontend: `NUXT_BACKEND_URL` (your Railway backend URL)
-  - Backend: `STEAM_API_KEY`, `DATABASE_URL` (if using remote DB)
+**Deploy to Vercel:**
 
-## Project Structure
+1. Push your code to GitHub
+2. Import project in [Vercel](https://vercel.com)
+3. Vercel auto-detects Nuxt configuration
+4. Add environment variables in Vercel dashboard:
+   - `STEAM_API_KEY`
+   - `NUXT_SESSION_SECRET`
+   - `FIREBASE_PROJECT_ID`
+   - `FIREBASE_CLIENT_EMAIL`
+   - `FIREBASE_PRIVATE_KEY`
+5. Deploy!
 
-```
-steam-receipts/
-├── frontend/                    # Nuxt 3 Application
-│   ├── components/              # Vue components
-│   │   ├── SteamReceipt.vue     # Main receipt display
-│   │   ├── ReceiptOptions.vue   # Settings panel
-│   │   ├── LoginCard.vue        # Login UI
-│   │   ├── LoadingState.vue     # Loading spinner
-│   │   └── AppLogo.vue          # App logo component
-│   ├── composables/             # Auto-imported composables
-│   │   └── useSteam.ts          # Steam state management
-│   ├── server/api/              # Nuxt server routes (BFF layer)
-│   │   ├── auth/                # Authentication endpoints
-│   │   │   ├── login.get.ts     # Initiate Steam login
-│   │   │   ├── callback.get.ts  # Handle Steam callback
-│   │   │   ├── me.get.ts        # Get current user
-│   │   │   └── logout.post.ts   # Logout
-│   │   └── steam/               # Steam data proxy
-│   │       ├── profile.get.ts   # User profile
-│   │       └── games/           # Games endpoints
-│   ├── types/                   # TypeScript types
-│   │   └── steam.ts             # Steam API types
-│   ├── assets/                  # Static assets (fonts, images)
-│   ├── app.vue                  # Root component
-│   ├── nuxt.config.ts           # Nuxt configuration
-│   └── package.json
-├── backend/                     # Hono API Server
-│   ├── src/
-│   │   ├── routes/              # API routes
-│   │   │   ├── auth.ts          # Steam authentication & validation
-│   │   │   └── steam.ts         # Steam data endpoints
-│   │   ├── lib/                 # Utilities
-│   │   │   ├── steam-auth.ts    # OpenID helpers
-│   │   │   └── steam-api.ts     # Steam API client
-│   │   ├── db/                  # Database
-│   │   │   ├── schema.ts        # Drizzle schema
-│   │   │   ├── queries.ts       # Database queries
-│   │   │   └── index.ts         # DB connection
-│   │   ├── app.ts               # Hono app setup
-│   │   └── index.ts             # Server entry point
-│   ├── drizzle/                 # Database migrations
-│   └── package.json
-└── README.md
-```
+## Endpoints (serverless functions running on Vercel)
 
-## API Endpoints
+### Authentication
 
-### Nuxt Server Routes (BFF - Browser calls these)
-- `GET /api/auth/login` - Initiate Steam login flow
-- `GET /api/auth/callback` - Handle Steam OAuth callback
-- `GET /api/auth/me` - Get current user session
+- `GET /api/auth/login` - Initiate Steam OpenID login flow
+- `GET /api/auth/callback` - Validate Steam OpenID callback & set session
+- `GET /api/auth/me` - Get current user session (from cache or Steam API)
 - `POST /api/auth/logout` - Clear session cookie
-- `GET /api/steam/games` - Get user's owned games (all-time)
+
+### Steam Data
+
+- `GET /api/steam/profile` - Get user's Steam profile (Firestore cached, 1hr TTL)
+- `GET /api/steam/games?limit=10` - Get owned games, sorted by playtime (cached)
+- `GET /api/steam/games/recent?limit=5` - Get recently played games (filtered from cache)
+
+### Caching Strategy
+
+- User profiles cached in `users/{steamId}` collection
+- All games cached in `userGames/{steamId}` collection (single source of truth)
+- Recent games filtered in-memory from cached games (no separate API call)
+- Cache TTL: 1 hour
 - `GET /api/steam/games/recent` - Get recently played games
 - `GET /api/steam/profile` - Get user's Steam profile
 
 ### Backend API Routes (Nuxt server calls these)
+
 - `GET /auth/steam/url` - Get Steam OpenID login URL
 - `POST /auth/steam/validate` - Validate Steam OpenID response
 - `GET /steam/games` - Get owned games (requires `X-Steam-Id` header)
