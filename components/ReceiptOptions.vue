@@ -61,6 +61,18 @@
           </div>
         </div>
         <v-btn
+          :color="showRemaining ? 'accent' : undefined"
+          :variant="showRemaining ? 'elevated' : 'outlined'"
+          size="large"
+          class="d-sm-inline-flex"
+          :block="$vuetify.display.xs"
+          :disabled="isRemainingDisabled"
+          @click="showRemaining = !showRemaining"
+          :prepend-icon="showRemaining ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline'"
+        >
+          Show remaining
+        </v-btn>
+        <v-btn
           color="accent"
           variant="elevated"
           size="large"
@@ -79,15 +91,19 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, computed } from 'vue';
   import html2canvas from 'html2canvas';
   import type { ReceiptType } from '~/types/steam';
 
-  const { user, receiptOptions, receiptElement, setReceiptType, setReceiptLimit } = useSteam();
+  const { user, receiptOptions, receiptElement, showRemainingGames, totalGamesCount, setReceiptType, setReceiptLimit, setShowRemainingGames } = useSteam();
 
   const selectedType = ref<ReceiptType>(receiptOptions.value.type);
   const selectedLimit = ref(10);
+  const showRemaining = ref(showRemainingGames.value);
   const isDownloading = ref(false);
+
+  // Local computed for button disabled state to ensure reactivity
+  const isRemainingDisabled = computed(() => selectedLimit.value >= totalGamesCount.value);
 
   async function downloadReceipt() {
     if (!receiptElement.value) {
@@ -136,6 +152,24 @@
 
   watch(selectedLimit, newLimit => {
     setReceiptLimit(newLimit);
+  });
+
+  watch(showRemaining, newValue => {
+    setShowRemainingGames(newValue);
+  });
+
+  // Disable showRemaining when limit covers all games
+  watch([selectedLimit, totalGamesCount], ([limit, total]) => {
+    if (limit >= total && showRemaining.value) {
+      showRemaining.value = false;
+    }
+  });
+
+  onBeforeMount(() => {
+    // initialize with current options
+    setReceiptType(selectedType.value);
+    setReceiptLimit(selectedLimit.value);
+    setShowRemainingGames(showRemaining.value);
   });
 </script>
 

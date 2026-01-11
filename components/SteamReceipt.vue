@@ -36,6 +36,18 @@
           </div>
           <span class="game-time">{{ formatPlaytime(getGamePlaytime(game)) }}</span>
         </div>
+
+        <!-- Remaining Games -->
+        <div
+          v-if="showRemainingGames && remainingPlaytime > 0"
+          class="game-item d-flex justify-space-between px-2 pb-1 pt-2"
+        >
+          <div class="d-flex">
+            <span class="game-rank mr-2">+</span>
+            <span class="game-name">Remaining games</span>
+          </div>
+          <span class="game-time">{{ formatPlaytime(remainingPlaytime) }}</span>
+        </div>
       </div>
 
       <!-- Total -->
@@ -64,7 +76,15 @@
   import barcodeImage from '~/assets/barcode.png';
   import wrinkledPaper from '~/assets/paper-texture-background.jpg';
 
-  const { user, receiptOptions, displayedGames, totalPlaytime, setReceiptElement } = useSteam();
+  const {
+    user,
+    receiptOptions,
+    displayedGames,
+    totalPlaytime,
+    showRemainingGames,
+    remainingPlaytime,
+    setReceiptElement
+  } = useSteam();
 
   const origin = computed(() =>
     typeof window !== 'undefined' && window.location?.origin
@@ -115,7 +135,8 @@
 
   function formatPlaytime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
+    const mins = String(minutes % 60).padStart(2, '0');
+
     if (hours === 0) {
       return `${mins}m`;
     }

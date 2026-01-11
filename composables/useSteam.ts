@@ -9,6 +9,7 @@ export const useSteam = () => {
     type: 'recent',
     limit: 10
   }));
+  const showRemainingGames = useState('steam-show-remaining', () => false);
   const isLoading = useState('steam-loading', () => false);
   const error = useState<string | null>('steam-error', () => null);
   const receiptElement = useState<HTMLElement | null>('steam-receipt-element', () => null);
@@ -19,14 +20,30 @@ export const useSteam = () => {
     const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
     const playtimeKey =
       receiptOptions.value.type === 'recent' ? 'playtime_2weeks' : 'playtime_forever';
-    return games
+    const displayedTotal = games
       .slice(0, receiptOptions.value.limit)
       .reduce((total, game) => total + (game[playtimeKey] || 0), 0);
+    return displayedTotal + remainingPlaytime.value;
   });
 
   const displayedGames = computed(() => {
     const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
     return games.slice(0, receiptOptions.value.limit);
+  });
+
+  const totalGamesCount = computed(() => {
+    const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+    return games.length;
+  });
+
+  const remainingPlaytime = computed(() => {
+    if (!showRemainingGames.value) return 0;
+    const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+    const playtimeKey =
+      receiptOptions.value.type === 'recent' ? 'playtime_2weeks' : 'playtime_forever';
+    return games
+      .slice(receiptOptions.value.limit)
+      .reduce((total, game) => total + (game[playtimeKey] || 0), 0);
   });
 
   const login = () => {
@@ -73,7 +90,7 @@ export const useSteam = () => {
     error.value = null;
 
     try {
-      const games = await $fetch<any[]>(`/api/steam/games/recent?limit=${MAX_ITEMS}`);
+      const games = await $fetch<any[]>('/api/steam/games/recent');
       recentGames.value = games.map(game => ({
         ...game,
         img_icon_url: `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`
@@ -93,7 +110,7 @@ export const useSteam = () => {
     error.value = null;
 
     try {
-      const games = await $fetch<any[]>(`/api/steam/games?limit=${MAX_ITEMS}`);
+      const games = await $fetch<any[]>('/api/steam/games');
       allTimeGames.value = games.map(game => ({
         ...game,
         img_icon_url: `https://cdn.cloudflare.steamstatic.com/steam/apps/${game.appid}/header.jpg`
@@ -125,6 +142,10 @@ export const useSteam = () => {
     receiptElement.value = element;
   };
 
+  const setShowRemainingGames = (show: boolean) => {
+    showRemainingGames.value = show;
+  };
+
   // Mock data for demonstration purposes
   const setMockData = () => {
     isLoading.value = true;
@@ -142,78 +163,8 @@ export const useSteam = () => {
         personastate: 1
       };
 
-      user.value = {
-        steamid: '76561198012345678',
-        personaname: 'GamerPro2024',
-        profileurl: 'https://steamcommunity.com/id/gamerpro2024/',
-        avatar: 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb.jpg',
-        avatarmedium:
-          'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg',
-        avatarfull:
-          'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg',
-        personastate: 1
-      };
-
-      recentGames.value = [
-        {
-          appid: 730,
-          name: 'Counter-Strike 2',
-          playtime_2weeks: 1847,
-          playtime_forever: 24560,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg'
-        },
-        {
-          appid: 570,
-          name: 'Dota 2',
-          playtime_2weeks: 965,
-          playtime_forever: 15420,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg'
-        },
-        {
-          appid: 1172470,
-          name: 'Apex Legends',
-          playtime_2weeks: 542,
-          playtime_forever: 3200,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1172470/header.jpg'
-        },
-        {
-          appid: 1245620,
-          name: 'ELDEN RING',
-          playtime_2weeks: 423,
-          playtime_forever: 1850,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg'
-        },
-        {
-          appid: 892970,
-          name: 'Valheim',
-          playtime_2weeks: 312,
-          playtime_forever: 890,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/892970/header.jpg'
-        },
-        {
-          appid: 413150,
-          name: 'Stardew Valley',
-          playtime_2weeks: 187,
-          playtime_forever: 456,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg'
-        },
-        {
-          appid: 1091500,
-          name: 'Cyberpunk 2077',
-          playtime_2weeks: 156,
-          playtime_forever: 320,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg'
-        },
-        {
-          appid: 814380,
-          name: 'Sekiro™: Shadows Die Twice',
-          playtime_2weeks: 98,
-          playtime_forever: 245,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/814380/header.jpg'
-        }
-      ];
-
-      allTimeGames.value = [
+      // Single source of truth for all games (like the real API)
+      const mockGames: RecentGame[] = [
         {
           appid: 730,
           name: 'Counter-Strike 2',
@@ -238,16 +189,9 @@ export const useSteam = () => {
         {
           appid: 1245620,
           name: 'ELDEN RING',
-          playtime_2weeks: 0,
+          playtime_2weeks: 423,
           playtime_forever: 5850,
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg'
-        },
-        {
-          appid: 292030,
-          name: 'The Witcher 3: Wild Hunt - Game of the Year Edition',
-          playtime_2weeks: 0,
-          playtime_forever: 4560,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg'
         },
         {
           appid: 892970,
@@ -257,18 +201,32 @@ export const useSteam = () => {
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/892970/header.jpg'
         },
         {
+          appid: 413150,
+          name: 'Stardew Valley',
+          playtime_2weeks: 187,
+          playtime_forever: 2100,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg'
+        },
+        {
           appid: 1091500,
-          name: 'Cyberpunk 2077: Phantom Liberty Ultimate Edition',
-          playtime_2weeks: 0,
+          name: 'Cyberpunk 2077',
+          playtime_2weeks: 156,
           playtime_forever: 3200,
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg'
         },
         {
           appid: 814380,
-          name: 'Sekiro™: Shadows Die Twice - GOTY Edition',
-          playtime_2weeks: 0,
+          name: 'Sekiro™: Shadows Die Twice',
+          playtime_2weeks: 98,
           playtime_forever: 2800,
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/814380/header.jpg'
+        },
+        {
+          appid: 292030,
+          name: 'The Witcher 3: Wild Hunt',
+          playtime_2weeks: 6,
+          playtime_forever: 4560,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg'
         },
         {
           appid: 1174180,
@@ -283,13 +241,6 @@ export const useSteam = () => {
           playtime_2weeks: 0,
           playtime_forever: 2400,
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1085660/header.jpg'
-        },
-        {
-          appid: 413150,
-          name: 'Stardew Valley',
-          playtime_2weeks: 0,
-          playtime_forever: 2100,
-          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg'
         },
         {
           appid: 105600,
@@ -342,7 +293,7 @@ export const useSteam = () => {
         },
         {
           appid: 1422450,
-          name: 'BRAZILIAN DRUG DEALER 3: I OPENED A PORTAL TO HELL IN THE FAVELA TRYING TO REVIVE MIT AIA I NEED TO CLOSE IT',
+          name: 'AVIÃOZINHO DO TRÁFICO 3:ABRI UM PORTAL PRO INFERNO NA FAVELA TENTANDO REVIVER MIT AIA E PRECISO FECHAR',
           playtime_2weeks: 0,
           playtime_forever: 950,
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1422450/header.jpg'
@@ -388,8 +339,51 @@ export const useSteam = () => {
           playtime_2weeks: 0,
           playtime_forever: 350,
           img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1817190/header.jpg'
+        },
+        {
+          appid: 582010,
+          name: 'Monster Hunter: World',
+          playtime_2weeks: 0,
+          playtime_forever: 310,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/582010/header.jpg'
+        },
+        {
+          appid: 1145360,
+          name: 'Hades',
+          playtime_2weeks: 0,
+          playtime_forever: 280,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg'
+        },
+        {
+          appid: 367520,
+          name: 'Hollow Knight',
+          playtime_2weeks: 0,
+          playtime_forever: 245,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/367520/header.jpg'
+        },
+        {
+          appid: 1250410,
+          name: 'Microsoft Flight Simulator',
+          playtime_2weeks: 0,
+          playtime_forever: 210,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1250410/header.jpg'
+        },
+        {
+          appid: 1593500,
+          name: 'God of War',
+          playtime_2weeks: 0,
+          playtime_forever: 185,
+          img_icon_url: 'https://cdn.cloudflare.steamstatic.com/steam/apps/1593500/header.jpg'
         }
       ];
+
+      // Recent games: filter by playtime_2weeks > 0, sorted by playtime_2weeks
+      recentGames.value = mockGames
+        .filter(g => (g.playtime_2weeks || 0) > 0)
+        // .sort((a, b) => (b.playtime_2weeks || 0) - (a.playtime_2weeks || 0));
+
+      // All-time games: all games sorted by playtime_forever
+      allTimeGames.value = mockGames;
 
       isLoading.value = false;
     }, 1500);
@@ -400,11 +394,14 @@ export const useSteam = () => {
     recentGames,
     allTimeGames,
     receiptOptions,
+    showRemainingGames,
     isLoading,
     error,
     isAuthenticated,
     totalPlaytime,
     displayedGames,
+    totalGamesCount,
+    remainingPlaytime,
     receiptElement,
     login,
     logout,
@@ -414,6 +411,7 @@ export const useSteam = () => {
     setReceiptType,
     setReceiptLimit,
     setReceiptElement,
+    setShowRemainingGames,
     setMockData
   };
 };
