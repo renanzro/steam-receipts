@@ -100,10 +100,9 @@ export async function fetchUserGames(steamId: string): Promise<SteamGame[]> {
 
   const games = data.response.games || [];
 
-  // Sort by total playtime (most played first)
-  games.sort((a, b) => b.playtime_forever - a.playtime_forever);
-
-  return games;
+  return games
+    .filter(x => x.playtime_forever > 0)
+    .sort((a, b) => b.playtime_forever - a.playtime_forever);
 }
 
 /**
