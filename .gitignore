@@ -43,8 +43,7 @@ Thumbs.db
 # Database
 *.db
 
-# Nuxt dev/build files
+# dev/build files
 .nuxt
-
-# Vercel
 .vercel
+.output

@@ -64,6 +64,9 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'See your gaming activity in a receipt-style!' }
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }
       ]
     }
   }
