@@ -9,15 +9,27 @@ export const useSteam = () => {
     type: 'recent',
     limit: 10
   }));
-  const showRemainingGames = useState('steam-show-remaining', () => false);
+  const showRemainingGames = useState('steam-show-remaining', () => true);
+  const hiddenGameIds = useState<Set<number>>('steam-hidden-games', () => new Set());
   const isLoading = useState('steam-loading', () => false);
   const error = useState<string | null>('steam-error', () => null);
   const receiptElement = useState<HTMLElement | null>('steam-receipt-element', () => null);
 
   const isAuthenticated = computed(() => user.value !== null);
 
-  const totalPlaytime = computed(() => {
+  // All games in the current category (unfiltered, for hide games dialog)
+  const allGamesInCategory = computed(() => {
+    return receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+  });
+
+  // Filtered games (excluding hidden games)
+  const filteredGames = computed(() => {
     const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+    return games.filter(game => !hiddenGameIds.value.has(game.appid));
+  });
+
+  const totalPlaytime = computed(() => {
+    const games = filteredGames.value;
     const playtimeKey =
       receiptOptions.value.type === 'recent' ? 'playtime_2weeks' : 'playtime_forever';
     const displayedTotal = games
@@ -27,18 +39,18 @@ export const useSteam = () => {
   });
 
   const displayedGames = computed(() => {
-    const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+    const games = filteredGames.value;
     return games.slice(0, receiptOptions.value.limit);
   });
 
   const totalGamesCount = computed(() => {
-    const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+    const games = filteredGames.value;
     return games.length;
   });
 
   const remainingPlaytime = computed(() => {
     if (!showRemainingGames.value) return 0;
-    const games = receiptOptions.value.type === 'recent' ? recentGames.value : allTimeGames.value;
+    const games = filteredGames.value;
     const playtimeKey =
       receiptOptions.value.type === 'recent' ? 'playtime_2weeks' : 'playtime_forever';
     return games
@@ -145,6 +157,30 @@ export const useSteam = () => {
   const setShowRemainingGames = (show: boolean) => {
     showRemainingGames.value = show;
   };
+
+  const toggleHiddenGame = (appid: number) => {
+    const newSet = new Set(hiddenGameIds.value);
+    if (newSet.has(appid)) {
+      newSet.delete(appid);
+    } else {
+      newSet.add(appid);
+    }
+    hiddenGameIds.value = newSet;
+  };
+
+  const isGameHidden = (appid: number) => {
+    return hiddenGameIds.value.has(appid);
+  };
+
+  const clearHiddenGames = () => {
+    hiddenGameIds.value = new Set();
+  };
+
+  const hiddenGamesCount = computed(() => {
+    // Count only hidden games that exist in current category
+    const currentGames = allGamesInCategory.value;
+    return currentGames.filter(game => hiddenGameIds.value.has(game.appid)).length;
+  });
 
   // Mock data for demonstration purposes
   const setMockData = () => {
@@ -395,6 +431,7 @@ export const useSteam = () => {
     allTimeGames,
     receiptOptions,
     showRemainingGames,
+    hiddenGameIds,
     isLoading,
     error,
     isAuthenticated,
@@ -403,6 +440,9 @@ export const useSteam = () => {
     totalGamesCount,
     remainingPlaytime,
     receiptElement,
+    allGamesInCategory,
+    filteredGames,
+    hiddenGamesCount,
     login,
     logout,
     checkAuth,
@@ -412,6 +452,9 @@ export const useSteam = () => {
     setReceiptLimit,
     setReceiptElement,
     setShowRemainingGames,
+    toggleHiddenGame,
+    isGameHidden,
+    clearHiddenGames,
     setMockData
   };
 };
