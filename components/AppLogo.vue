@@ -18,7 +18,7 @@
   );
 
   const logoStyle = computed(() => ({
-    width: `${props.size}px`,
+    minWidth: `${props.size}px`,
     height: `${props.size}px`
   }));
 </script>

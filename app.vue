@@ -1,54 +1,70 @@
 <template>
-  <v-app>
-    <v-app-bar color="primary" elevation="0">
-      <v-app-bar-title class="d-flex align-center">
-        <AppLogo :size="28" color="white" class="mr-2" />
-        Steam Receipts
-      </v-app-bar-title>
-      <template #append>
-        <v-btn v-if="isAuthenticated" @click="logout" variant="text" prepend-icon="mdi-logout">
-          Logout
-        </v-btn>
-      </template>
-    </v-app-bar>
+  <div class="min-h-screen flex flex-col bg-base-100 text-base-content">
+    <!-- App Bar -->
+    <div class="navbar bg-neutral px-5">
+      <div class="flex-1 flex items-center">
+        <AppLogo :size="30" color="white" class="mx-2" />
+        <span class="text-xl font-medium">Steam Receipts</span>
+      </div>
 
-    <v-main class="main-content">
+      <div>
+        <button
+          v-if="isAuthenticated"
+          @click="logout"
+          class="btn btn-ghost"
+        >
+          <span class="mdi mdi-logout" />
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 main-content relative">
       <LoadingState v-if="isLoading" />
 
-      <v-container v-else-if="isAuthenticated" fluid>
-        <v-row class="justify-space-evenly">
-          <v-col cols="12" md="7" lg="5">
+      <div v-else-if="isAuthenticated" class="pt-6">
+        <div class="flex flex-wrap justify-evenly items-start gap-6">
+          <div class="w-full md:w-6/12 lg:w-4/12">
             <ReceiptOptions />
-          </v-col>
+          </div>
 
-          <v-col cols="12" md="4" lg="4" class="d-flex justify-center">
+          <div class="w-full md:w-6/12 lg:w-4/12 flex justify-center">
             <SteamReceipt />
-          </v-col>
-        </v-row>
-      </v-container>
+          </div>
+        </div>
+      </div>
 
-      <v-container v-else class="fill-height" fluid>
+      <div v-else class="absolute inset-0 flex items-center justify-center">
         <LoginCard />
-      </v-container>
-    </v-main>
+      </div>
+    </main>
 
-    <v-footer color="primary" class="pa-2 d-flex justify-center align-center flex-grow-0">
-      <span class="text-caption text-medium-emphasis">
-        Steam Receipts by renanzro © {{ new Date().getFullYear() }}
-      </span>
-
-      <v-btn
-        icon="mdi-github"
-        variant="text"
-        href="https://github.com/renanzro/steam-receipts"
-        target="_blank"
-        class="ml-2"
-      />
-    </v-footer>
-  </v-app>
+    <!-- Footer -->
+    <footer class="footer footer-center bg-neutral p-4 ">
+      <div class="flex items-center">
+        <span class="text-sm text-neutral-content/60">
+          Steam Receipts by renanzro © {{ new Date().getFullYear() }}
+        </span>
+        <a
+          href="https://github.com/renanzro/steam-receipts"
+          target="_blank"
+          class="text-neutral-content/80 hover:text-neutral-content ml-2"
+        >
+          <span class="mdi mdi-github text-xl"></span>
+        </a>
+      </div>
+    </footer>
+  </div>
 </template>
 
 <script setup lang="ts">
+  useHead({
+    htmlAttrs: {
+      'data-theme': 'steam'
+    }
+  });
+
   const { isAuthenticated, logout, isLoading, checkAuth, error } = useSteam();
 
   // Initialize auth on client-side mount

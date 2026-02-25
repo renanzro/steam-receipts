@@ -48,8 +48,8 @@ export function getDb(): Firestore {
   return db;
 }
 
-// Cache TTL in milliseconds (1 hour)
-const CACHE_TTL = 60 * 60 * 1000;
+// Cache TTL in milliseconds (12 hours)
+const CACHE_TTL = 12 * 60 * 60 * 1000;
 
 /**
  * Remove undefined values from an object (Firestore doesn't allow undefined)

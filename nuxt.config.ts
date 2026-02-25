@@ -1,32 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite';
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
 
-  modules: ['vuetify-nuxt-module'],
+  modules: [],
 
-  vuetify: {
-    moduleOptions: {
-      styles: true,
-      autoImport: true
-    },
-    vuetifyOptions: {
-      theme: {
-        defaultTheme: 'dark',
-        themes: {
-          dark: {
-            colors: {
-              primary: '#171a21',
-              secondary: '#1b2838',
-              accent: '#66c0f4',
-              'accent-border': '#316381',
-              background: '#1b2838',
-              surface: '#2a475e'
-            }
-          }
-        }
-      }
-    }
+  vite: {
+    plugins: [tailwindcss()]
   },
 
   css: ['@mdi/font/css/materialdesignicons.css', '~/assets/css/main.css'],

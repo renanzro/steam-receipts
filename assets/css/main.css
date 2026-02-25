@@ -1,27 +1,87 @@
-/* Custom scrollbar for dark theme */
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: false;
+}
+
+/* ── Steam custom theme ── */
+@plugin "daisyui/theme" {
+  name: "steam";
+  default: true;
+  color-scheme: dark;
+
+  /* Page / surface backgrounds */
+  --color-base-100: oklch(27.28% 0.0349 254.07);   /* #1b2838 – page bg */
+  --color-base-200: oklch(38.56% 0.0527 243.69);   /* #2a475e – cards */
+  --color-base-300: oklch(47.83% 0.0726 237.30);   /* #316381 – borders */
+  --color-base-content: oklch(100% 0 0);            /* white text */
+
+  /* Primary = Steam accent blue */
+  --color-primary: oklch(77.24% 0.1141 236.19);    /* #66c0f4 */
+  --color-primary-content: oklch(0% 0 0);           /* black text on blue */
+
+  /* Secondary – unused, keep as a lighter variant */
+  --color-secondary: oklch(47.83% 0.0726 237.30);  /* #316381 */
+  --color-secondary-content: oklch(100% 0 0);
+
+  /* Neutral = darkest bg (header/footer) */
+  --color-neutral: oklch(21.78% 0.0145 266.90);    /* #171a21 */
+  --color-neutral-content: oklch(100% 0 0);
+
+  /* Accent – reuse primary for consistency */
+  --color-accent: oklch(77.24% 0.1141 236.19);     /* #66c0f4 */
+  --color-accent-content: oklch(0% 0 0);
+
+  /* Semantic */
+  --color-info: oklch(77.24% 0.1141 236.19);
+  --color-info-content: oklch(0% 0 0);
+  --color-success: oklch(65% 0.17 145);
+  --color-success-content: oklch(0% 0 0);
+  --color-warning: oklch(74.53% 0.1758 59.36);     /* #fb8c00 */
+  --color-warning-content: oklch(100% 0 0);
+  --color-error: oklch(65% 0.2 25);
+  --color-error-content: oklch(100% 0 0);
+
+  /* Rounding – keep sharp to match Steam */
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+
+  /* Sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* ── Custom scrollbar ── */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1b2838;
+  background: var(--color-base-100, #1b2838);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a475e;
+  background: var(--color-base-200, #2a475e);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #66c0f4;
+  background: var(--color-primary, #66c0f4);
 }
 
-/* Custom border utility using theme color */
-.border-accent {
-  border: 1px solid rgb(var(--v-theme-accent-border)) !important;
+/* ── Range input: circular thumb ── */
+input[type="range"]::-webkit-slider-thumb {
+  border-radius: 9999px;
+}
+input[type="range"]::-moz-range-thumb {
+  border-radius: 9999px;
 }
 
-/* Main content background */
+/* ── Main content gradient ── */
 .main-content {
   background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
 }

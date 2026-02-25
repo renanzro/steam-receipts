@@ -1,9 +1,7 @@
 <template>
-  <v-card
+  <div
     ref="receiptCard"
-    class="receipt-card"
-    width="350"
-    elevation="2"
+    class="receipt-card w-[350px] shadow rounded overflow-hidden"
     :style="{
       backgroundImage: `url(${wrinkledPaper})`,
       backgroundPosition: `${randomPosition}% 0`
@@ -12,7 +10,7 @@
     <div class="receipt-content">
       <!-- Header -->
       <div class="text-center">
-        <v-icon size="48" color="black" class="mb-2">mdi-steam</v-icon>
+        <span class="mdi mdi-steam text-5xl text-black mb-2 block"></span>
         <h1 class="receipt-title">STEAM RECEIPT</h1>
         <p class="receipt-subtitle">{{ receiptSubtitle }}</p>
         <p class="receipt-period">{{ formattedDate }} {{ periodLabel }}</p>
@@ -20,7 +18,7 @@
 
       <!-- Games List -->
       <div class="games-list my-4">
-        <div class="list-header d-flex justify-space-between px-2 mb-2">
+        <div class="list-header flex justify-between px-2 mb-2">
           <span>GAME</span>
           <span>TIME</span>
         </div>
@@ -28,9 +26,9 @@
         <div
           v-for="(game, index) in displayedGames"
           :key="game.appid"
-          class="game-item d-flex justify-space-between px-2 pb-1"
+          class="game-item flex justify-between px-2 pb-1"
         >
-          <div class="d-flex">
+          <div class="flex">
             <span class="game-rank mr-2">{{ index + 1 }}.</span>
             <span class="game-name">{{ game.name }}</span>
           </div>
@@ -40,9 +38,9 @@
         <!-- Remaining Games -->
         <div
           v-if="showRemainingGames && remainingPlaytime > 0"
-          class="game-item d-flex justify-space-between px-2 pb-1 pt-2"
+          class="game-item flex justify-between px-2 pb-1 pt-2"
         >
-          <div class="d-flex">
+          <div class="flex">
             <span class="game-rank mr-2">+</span>
             <span class="game-name">Remaining games</span>
           </div>
@@ -51,7 +49,7 @@
       </div>
 
       <!-- Total -->
-      <div class="receipt-total d-flex justify-space-between px-2 mt-2">
+      <div class="receipt-total flex justify-between px-2 mt-2">
         <span class="total-label">TOTAL PLAYTIME:</span>
         <span class="total-value">{{ formatPlaytime(totalPlaytime) }}</span>
       </div>
@@ -63,11 +61,11 @@
         <p class="footer-text">Thank you for gaming!</p>
         <p v-if="origin" class="footer-subtext">{{ origin }}</p>
         <!-- use actual barcode font in future -->
-        <img :src="barcodeImage" alt="Barcode" style="max-width: 100%" />
+        <img :src="barcodeImage" alt="Barcode" class="max-w-full" />
         <p class="steam-id">{{ user?.steamid }}</p>
       </div>
     </div>
-  </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -92,7 +90,7 @@
       : undefined
   );
 
-  const receiptCard = ref<{ $el: HTMLElement } | null>(null);
+  const receiptCard = ref<HTMLElement | null>(null);
 
   const randomPosition = Math.floor(Math.random() * 100);
 
@@ -144,8 +142,8 @@
   }
 
   onMounted(() => {
-    if (receiptCard.value?.$el) {
-      setReceiptElement(receiptCard.value.$el);
+    if (receiptCard.value) {
+      setReceiptElement(receiptCard.value);
     }
   });
 
@@ -157,7 +155,7 @@
 <style scoped>
   @font-face {
     font-family: 'Fake Receipt';
-    src: url('~/assets/Fake Receipt.otf') format('opentype');
+    src: url('/fonts/FakeReceipt.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
   }

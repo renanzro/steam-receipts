@@ -12,7 +12,6 @@
   <img src="https://img.shields.io/badge/Nuxt%203-00DC82?style=flat&logo=nuxt&logoColor=white" alt="Nuxt 3" />
   <img src="https://img.shields.io/badge/Vue.js%203-4FC08D?style=flat&logo=vue.js&logoColor=white" alt="Vue.js 3" />
   <img src="https://img.shields.io/badge/TypeScript-blue?style=flat&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Vuetify%203-1867C0?style=flat&logo=vuetify&logoColor=white" alt="Vuetify 3" />
   <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black" alt="Firebase" />
   <img src="https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white" alt="Vercel" />
 </p>
@@ -45,8 +44,7 @@
 - **Nuxt 3** - Full-stack Vue framework with server-side rendering
 - **Vue.js 3** with Composition API
 - **TypeScript** for type safety
-- **Vuetify 3** for Material Design components
-- **html2canvas** for receipt image export
+- **daisyUI** for Steam-like components
 
 ### Backend (Serverless)
 
